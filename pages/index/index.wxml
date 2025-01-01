@@ -29,11 +29,11 @@
 
 
       <button class="calculate-pace-button" bindtap="calculatePace">提交</button>
-      <view class="pace-chart">
+      <!-- <view class="pace-chart">
         <block wx:for="{{paceData}}" wx:key="index">
           <text>{{item.km}}公里: {{item.pace}}</text>
         </block>
-      </view>
+      </view> -->
     </view>
 
 </scroll-view>

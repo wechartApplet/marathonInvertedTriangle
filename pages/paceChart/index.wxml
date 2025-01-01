@@ -1,0 +1,8 @@
+<!-- paceChart.wxml -->
+<view class="pace-chart">
+  <block wx:for="{{paceData}}" wx:key="index">
+    <view class="pace-bar">
+      <text>{{item.km}}公里: {{item.pace}}</text>
+    </view>
+  </block>
+</view>

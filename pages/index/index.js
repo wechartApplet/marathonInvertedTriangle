@@ -74,37 +74,48 @@ Page({
 
 
   calculatePace: function() {
-    const initialTime = this.data.timeOptions[this.data.initialTimeIndex];
-    const sprintTime = this.data.timeOptions[this.data.sprintTimeIndex];
-    const distance = parseInt(this.data.distance, 10);
-    const initialSeconds = this.convertToSeconds(initialTime);
-    const sprintSeconds = this.convertToSeconds(sprintTime);
-    const totalSeconds = initialSeconds - sprintSeconds;
-    const pacePerKm = totalSeconds / distance;
-    let paceData = [];
+    // const initialTime = this.data.timeOptions[this.data.initialTimeIndex];
+    // const sprintTime = this.data.timeOptions[this.data.sprintTimeIndex];
+    // const distance = parseInt(this.data.distance, 10);
+    // const initialSeconds = this.convertToSeconds(initialTime);
+    // const sprintSeconds = this.convertToSeconds(sprintTime);
+    // const totalSeconds = initialSeconds - sprintSeconds;
+    // const pacePerKm = totalSeconds / distance;
+    // let paceData = [];
 
-    for (let i = 1; i <= distance; i++) {
-      let currentSeconds = initialSeconds - (pacePerKm * i);
-      paceData.push({
-        km: i,
-        pace: this.formatTime(currentSeconds)
-      });
-    }
+    // for (let i = 1; i <= distance; i++) {
+    //   let currentSeconds = initialSeconds - (pacePerKm * i);
+    //   paceData.push({
+    //     km: i,
+    //     pace: this.formatTime(currentSeconds)
+    //   });
+    // }
 
-    this.setData({
-      paceData: paceData
+    // this.setData({
+    //   paceData: paceData
+    // });
+
+    // console.log('Calculating pace...');
+    // console.log(this.data.paceData);
+    let paceDataString = JSON.stringify(this.data.paceData);
+    // console.log('Pace data stringified:', paceDataString);
+  
+    wx.navigateTo({
+      // url: 'pages/paceChart/paceChart?paceData=' + paceDataString
+      url: '/pages/paceChart/index'
     });
+
   },
 
-  convertToSeconds: function(timeStr) {
-    const [hours, minutes, seconds] = timeStr.split(':').map(Number);
-    return hours * 3600 + minutes * 60 + seconds;
-  },
+  // convertToSeconds: function(timeStr) {
+  //   const [hours, minutes, seconds] = timeStr.split(':').map(Number);
+  //   return hours * 3600 + minutes * 60 + seconds;
+  // },
 
-  formatTime: function(seconds) {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  }
+  // formatTime: function(seconds) {
+  //   const hours = Math.floor(seconds / 3600);
+  //   const minutes = Math.floor((seconds % 3600) / 60);
+  //   const secs = seconds % 60;
+  //   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  // }
 });

@@ -1,0 +1,15 @@
+/* paceChart.wxss */
+.pace-chart {
+  display: flex;
+  flex-direction: column;
+}
+
+.pace-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.pace-bar text {
+  flex: 1;
+}
