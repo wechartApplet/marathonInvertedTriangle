@@ -8,7 +8,7 @@
     <a href='#'><img alt="Gitee forks" src="https://gitee.com/novel_dev_team/novel/badge/fork.svg?theme=gitee"></a>
 </p>
 
-# 马拉松倒三角计划配速计算器
+# 马拉松倒三角计划配速生成器
  + 此项目是一个微信小程序项目，长距离的运动需要循序渐进的由慢变快的模式，有计划有目的的合理分配体力，才不会受伤，此小程序主要就是解决此类极限运动的配速配置的业务场景。
 
 #### 开发环境

@@ -1,8 +1,17 @@
 <!-- paceChart.wxml -->
+<view class="summary">
+    <text>{{timeDescription}}: {{totalTime}}</text>
+    <text>最快配速: {{fastestPace}}</text>
+    <text>平均配速: {{averagePace}}</text>
+</view>
+
 <view class="pace-chart">
-  <block wx:for="{{paceData}}" wx:key="index">
-    <view class="pace-bar">
-      <text>{{item.km}}公里: {{item.pace}}</text>
-    </view>
-  </block>
+    <block wx:for="{{paceData}}" wx:key="km">
+        <view class="pace-bar">
+            <text class="km">{{item.km}}</text>
+            <view class="pace-bar-inner">{{formatTime(item.pace)}}</view>
+        </view>
+        <view wx:if="{{item.specialText}}" class="special-text">{{item.specialText}}</view>
+        <view wx:if="{{item.cumulativeTime}}" class="cumulative-time">{{item.cumulativeTime}}</view>
+    </block>
 </view>

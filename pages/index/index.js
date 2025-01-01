@@ -15,8 +15,7 @@ Page({
         selectedIndex: 0, // 默认选择的索引
         initialTimeIndex: 0, // 默认初始时间索引
         sprintTimeIndex: 0, // 默认冲刺时间索引
-        distanceIndex: 0,// 默认距离索引
-        paceData: []
+        distanceIndex: 0   // 默认距离索引
     },
     onLoad: function () {
         // 加载时将生成的时间值和距离值进行对应的赋值
@@ -83,9 +82,8 @@ Page({
             sprintTime: sprintTime,
             distance: distance
         };
-        this.data.paceData.push(paceDataObj);
         //6. 将数组序列化
-        let paceDataString = JSON.stringify(this.data.paceData);
+        let paceDataString = encodeURIComponent(JSON.stringify(paceDataObj));
         //7. 跳转页面
         wx.navigateTo({
             url: '/pages/paceChart/paceChart?paceData=' + paceDataString
