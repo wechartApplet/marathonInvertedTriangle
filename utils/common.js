@@ -63,9 +63,47 @@ function formatTime(seconds) {
         return secs.toString();
     }
 }
+/**
+ * 将秒转换为XX:XX:XX 必须以小时为开头哪怕为0
+ * @param {*} seconds 
+ */
+function formatTimeHour(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+
+/**
+ * 将hh:mm格式转换成hh'mm''
+ * @param {*} timeStr 
+ */
+function convertTimeFormat(timeStr) {
+    // 首先，通过冒号":"分割字符串
+    const parts = timeStr.split(':');
+    // 检查分割后的数组长度是否为2，即是否为HH:MM格式
+    if (parts.length === 2) {
+        // 使用模板字符串将小时和分钟转换为HH' MM''格式
+        return `${parts[0]}' ${parts[1]}''`;
+    } else {
+        // 如果格式不正确，抛出错误
+        throw new Error('Invalid time format. Please use HH:MM.');
+    }
+}
+/**
+ * 判断是否为整数
+ * @param {*} num 
+ */
+function isInteger(num) {
+    return Math.floor(num) === num;
+}
 
 module.exports = {
     getIndex,
     convertTimeToSeconds,
-    formatTime
+    formatTime,
+    convertTimeFormat,
+    formatTimeHour,
+    isInteger
 }

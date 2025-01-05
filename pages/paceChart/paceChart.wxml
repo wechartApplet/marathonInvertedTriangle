@@ -1,17 +1,59 @@
-<!-- paceChart.wxml -->
 <view class="summary">
-    <text>{{timeDescription}}: {{totalTime}}</text>
-    <text>最快配速: {{fastestPace}}</text>
-    <text>平均配速: {{averagePace}}</text>
+    <view class="info-column" wx:if="{{timeDescription}}">
+        <text class="info-value">{{totalTime}}</text>
+        <text class="info-label">{{timeDescription}}用时</text>
+    </view>
+    <view class="info-column">
+        <text class="info-value">{{fastestPace}}</text>
+        <text class="info-label">最快配速</text>
+    </view>
+    <view class="info-column">
+        <text class="info-value">{{averagePace}}</text>
+        <text class="info-label">平均配速</text>
+    </view>
 </view>
 
 <view class="pace-chart">
-    <block wx:for="{{paceData}}" wx:key="km">
-        <view class="pace-bar">
-            <text class="km">{{item.km}}</text>
-            <view class="pace-bar-inner">{{formatTime(item.pace)}}</view>
+    <!-- 表头行 -->
+    <view class="pace-row header">
+        <view class="pace-column km-column">
+            <text class="km-label">公里</text>
         </view>
-        <view wx:if="{{item.specialText}}" class="special-text">{{item.specialText}}</view>
-        <view wx:if="{{item.cumulativeTime}}" class="cumulative-time">{{item.cumulativeTime}}</view>
+        <view class="pace-column speed-column">
+            <text class="speed-label">配速</text>
+        </view>
+    </view>
+    <!-- 数据行 -->
+    <block wx:for="{{paceData}}" wx:key="index">
+        <view class="pace-row" wx:if="{{ item.km != 21.0975 &&  item.km != 42.195}}">
+            <view class="pace-row">
+                <!-- <view class="pace-column km-column"> -->
+                <text class="km-value">{{item.km}}</text>
+            </view>
+            <view class="pace-column paceChart-column pace-block-container">
+                <view class="pace-block dark {{item.isFast ? 'pace-isfast_bg' : ''}}">
+                    <text class="pace-value {{item.isFast ? 'pace-value_isfast' : ''}}" style="{{item.flexWidthVal}}">{{(item.pace)}}</text>
+                    <text wx:if="{{item.isFast}}" class="pace-isfast">最快</text>
+                </view>
+                <view class="time-details" wx:if="{{item.km % 5 == 0}}">
+                    <text wx:if="{{item.km % 5 == 0}}">{{item.km}}公里累计用时 {{item.cumulativeTime}}</text>
+                    <text wx:if="{{item.km % 5 == 0 && item.km != 5}}">近5公里用时 {{item.nearFiveKmTime}}</text>
+                </view>
+            </view>
+        </view>
     </block>
 </view>
+
+<!-- 测试  -->
+<!-- <view class="pace-info">
+    <view class="pace-block-container">
+        <view class="pace-block dark">
+            <text class="pace-time">08'06"</text>
+            <text class="additional-info">最快</text>
+        </view>
+    </view>
+    <view class="time-details">
+        <text>15公里累计用时 02:04:26</text>
+        <text>近5公里用时 00:41:00</text>
+    </view>
+</view> -->

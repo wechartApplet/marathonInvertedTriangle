@@ -1,5 +1,5 @@
 /* paceChart.wxss */
-.pace-chart {
+/* .pace-chart {
     display: flex;
     flex-direction: column;
 }
@@ -22,4 +22,174 @@
 .cumulative-time {
     font-size: 14px;
     color: #666;
+} */
+
+
+
+.summary {
+    display: flex;
+    justify-content: space-around;
 }
+
+.info-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.info-value {
+    font-size: 24px;
+    margin-bottom: 5px;
+    color: rgba(48, 226, 152);
+}
+
+.info-label {
+    font-size: 14px;
+    color: rgba(50, 50, 50);
+}
+
+/*公里配速表格数据样式*/
+.pace-chart {
+    display: flex;
+    flex-direction: column;
+    margin: 8% 0;
+}
+
+.pace-chart>view {
+    display: flex;
+}
+
+.pace-chart>view>view:first-child {
+    flex: 0.2;
+    margin-left: 7%;
+}
+
+.pace-chart>view>view:last-child {
+    flex: 0.8;
+    margin-right: 7%;
+}
+
+
+.header {
+    margin-bottom: 10px;
+    color: rgba(179, 179, 179);
+}
+
+.dark {
+    background-color: rgba(234, 251, 245);
+    border-radius: 15px;
+    padding: 8px 0;
+    display: flex;
+}
+
+.dark>.pace-value {
+    color: rgba(235, 255, 253);
+    background-color: #2ecc71;
+    background: linear-gradient(to right, rgb(107, 230, 178), #2ecc71, );
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-weight: bold;
+}
+
+.dark>text.pace-value_isfast {
+    background-color: rgb(254, 146, 73);
+    background: linear-gradient(to right, rgb(254, 146, 73), rgb(255, 76, 46), );
+}
+
+.pace-isfast {
+    padding-left: 5%;
+    color: rgba(254, 103, 58);
+}
+
+.pace-isfast_bg {
+    background-color: rgb(255, 239, 239);
+}
+
+
+.time-details {
+    display: flex;
+    /* 允许内容换行 */
+    flex-wrap: wrap;
+    padding: 6px 0px;
+}
+
+.time-details>text {
+    padding: 5px 0;
+}
+
+
+.special-text,
+.cumulative-time {
+    /* font-size: 12px; */
+    /* color: #999; */
+
+    /* margin-top: 5px; */
+
+}
+
+
+/*测试样式*/
+/* .pace-info {
+    display: flex;
+    /* 垂直排列子元素 */
+/* flex-direction: column; */
+/* 子元素靠左对齐 */
+/* align-items: flex-start; */
+/* 底部外边距 */
+/* margin-bottom: 10px; */
+/* } */
+
+/* .pace-block-container {
+    display: flex;
+    align-items: center;
+} */
+
+/* .pace-block {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+} */
+
+/* .dark {
+    background-color: rgba(234, 251, 245);
+} */
+
+/* .pace-time {
+    background-color: #2ecc71;
+    padding: 5px 10px;
+    width: 50%;
+    border-radius: 15px;
+    font-weight: bold;
+} */
+
+/* .additional-info {
+    /* background-color: rgba(234, 251, 245); */
+/* flex: 0 0 70%; */
+/* text-align: left;
+    font-weight: normal;
+    color: rgba(224, 81, 41); */
+/* }  */
+
+/* .light {
+    background-color: #f5f5f5;
+    /* 浅色背景 */
+/* padding: 5px 10px; */
+/* 内边距 */
+/* flex: 0 0 60%; */
+/* 浅色块宽度与深色块相同 */
+/* justify-content: flex-end; */
+/* 内容右对齐 */
+/* z-index: 1; */
+/* 确保浅色块在下层 */
+/* } */
+
+/* .time-details {
+    font-size: 14px;
+    /* 字体大小 */
+/* color: #666; */
+/* 字体颜色 */
+/* margin-top: 5px; */
+/* 与上方块的间距 */
+/* } */
