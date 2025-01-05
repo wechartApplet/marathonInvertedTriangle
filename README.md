@@ -51,7 +51,7 @@
 
 ![](./Images/img_1.png)
 
-![](./Images//img_2.jpg)
+![](./Images/img_2.png)
 
 
 #### 参考链接
