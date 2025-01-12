@@ -32,13 +32,13 @@
 - 工具规范：使用统一jar包避免出现内容冲突。
 - 代码整洁：可读性、维护性高。
 
-#### 包的结构
-
-+- marathonInvertedTriangle -- 项目根目录，通常以项目名称命名。
+#### 包的结构 
+```
++- marathonInvertedTriangle -- 项目根目录
 |   +- .eslintrc.js -- ESLint 配置文件，用于定义代码的 linting 规则，确保代码风格一致。
-|   +- .git -- Git 版本控制目录，包含项目的版本控制信息。
-|   +- .vscode -- Visual Studio Code 配置目录，包含编辑器的设置文件。
-|   |   +- settings.json -- Visual Studio Code 的项目特定设置文件，用于配置编辑器的行为。
+|   +- .git -- Git 版本控制目录
+|   +- .vscode -- Visual Studio Code 配置目录
+|   |   +- settings.json -- Visual Studio Code 的项目特定设置文件
 |   +- app.js -- 小程序的全局逻辑文件，包含小程序的生命周期函数和全局数据。
 |   +- app.json -- 小程序的全局配置文件，定义了页面路径、窗口表现、网络超时时间等。
 |   +- app.wxss -- 小程序的全局样式文件，定义了全局的 CSS 样式。
@@ -61,14 +61,14 @@
 |   |   |   +- paceChart.wxss -- 配速图表页面的样式文件。
 |   +- project.config.json -- 小程序项目的配置文件，包含项目的基本信息和开发工具的配置。
 |   +- project.private.config.json -- 小程序项目的私有配置文件，包含一些敏感信息，如云开发配置等。
-|   +- README.md -- 项目的说明文件，通常包含项目介绍、使用方法等信息。
+|   +- README.md -- 项目的说明文件
 |   +- sitemap.json -- 小程序的sitemap配置文件，用于定义页面的访问规则和搜索引擎抓取规则。
 |   +- utils -- 存放工具函数的目录，包含一些通用的辅助函数。
 |   |   +- common.js -- 通用工具函数，如时间格式化、数据转换等。
 |   |   +- distancePicker.js -- 距离选择器的工具函数。
 |   |   +- timePicker.js -- 时间选择器的工具函数。
 |   |   +- util.js -- 其他通用工具函数。
-
+```
 
 #### 项目运行
 
