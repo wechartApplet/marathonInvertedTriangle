@@ -25,35 +25,21 @@
     </view>
     <!-- 数据行 -->
     <block wx:for="{{paceData}}" wx:key="index">
-        <view class="pace-row" wx:if="{{ item.km != 21.0975 &&  item.km != 42.195}}">
-            <view class="pace-row">
-                <!-- <view class="pace-column km-column"> -->
-                <text class="km-value">{{item.km}}</text>
+        <view class="pace-row pace_row_tr">
+            <view class="pace-column km-column">
+                <text class="km-value" wx:if="{{!item.isLessThanOneKm}}">{{item.km}}</text>
             </view>
             <view class="pace-column paceChart-column pace-block-container">
-                <view class="pace-block dark {{item.isFast ? 'pace-isfast_bg' : ''}}">
-                    <text class="pace-value {{item.isFast ? 'pace-value_isfast' : ''}}" style="{{item.flexWidthVal}}">{{(item.pace)}}</text>
-                    <text wx:if="{{item.isFast}}" class="pace-isfast">最快</text>
+                <view class="pace-block dark {{item.isFast ? 'pace-isfast_bg' : ''}}" wx:if="{{!item.isLessThanOneKm}}">
+                    <text class="pace-value {{item.isFast ? 'pace-value_isfast' : ''}}" style="{{'flex: ' +item.flexWidthVal}}">{{(item.pace)}}</text>
+                    <text wx:if="{{item.isFast}}" class="pace-isfast" style="{{'flex: ' + (1- item.flexWidthVal)}}">最快</text>
                 </view>
-                <view class="time-details" wx:if="{{item.km % 5 == 0}}">
+                <view class="time-details" wx:if="{{item.km % 5 == 0 || item.isLessThanOneKm}}">
                     <text wx:if="{{item.km % 5 == 0}}">{{item.km}}公里累计用时 {{item.cumulativeTime}}</text>
                     <text wx:if="{{item.km % 5 == 0 && item.km != 5}}">近5公里用时 {{item.nearFiveKmTime}}</text>
+                    <text wx:if="{{item.isLessThanOneKm}}">最后不足一公里用时 {{item.currentKmTime}}</text>
                 </view>
             </view>
         </view>
     </block>
 </view>
-
-<!-- 测试  -->
-<!-- <view class="pace-info">
-    <view class="pace-block-container">
-        <view class="pace-block dark">
-            <text class="pace-time">08'06"</text>
-            <text class="additional-info">最快</text>
-        </view>
-    </view>
-    <view class="time-details">
-        <text>15公里累计用时 02:04:26</text>
-        <text>近5公里用时 00:41:00</text>
-    </view>
-</view> -->

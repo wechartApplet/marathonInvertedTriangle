@@ -24,23 +24,21 @@ Page({
         // 检查这个值是否如预期
     },
     /**
-     * 
+     * 接收前一个页面传递过来的参数进行计算
      * @param {*} totalDistance 
      * @param {*} initialPace 
      * @param {*} sprintPace 
      */
     calculatePaceData(totalDistance, initialPace, sprintPace) {
+        //将接收到的前一个页面传递过来的参数传给专门计算的方法
         const paceData = this.calculatePace(initialPace, sprintPace, totalDistance);
-        console.log(paceData);
         if (!paceData || paceData.length === 0) {
             console.error('Pace data is empty or undefined');
             return; // 退出方法，避免进一步的错误
         }
-        // const totalTimeSeconds = paceData[paceData.length - 1].pace;
         const totalTimeSeconds = paceData.reduce((acc, { pace }) => acc + pace, 0);
         const timeDescription = this.determineDistanceType(totalDistance);
-
-        console.log(common.formatTimeHour(Math.round(paceData[0].nearFiveKmTime)));
+        // 为页面变量赋值
         this.setData({
             timeDescription: timeDescription,
             totalTime: common.formatTime(Math.ceil(totalTimeSeconds)),// 向上取整
@@ -49,10 +47,12 @@ Page({
             paceData: paceData.map(pace => ({
                 km: pace.km,
                 pace: common.convertTimeFormat(common.formatTime(Math.round(pace.pace))),//四舍五入
+                currentKmTime: common.formatTimeHour(Math.ceil(pace.currentKmTime)),
                 isFast: pace.isFast,
+                isLessThanOneKm: pace.isLessThanOneKm,
                 cumulativeTime: common.formatTimeHour(Math.round(pace.cumulativeTime)),
                 nearFiveKmTime: common.formatTimeHour(Math.round(pace.nearFiveKmTime)),
-                flexWidthVal: "flex: " + pace.flexWidthVal
+                flexWidthVal: pace.flexWidthVal
             })),
         });
     },
@@ -67,58 +67,86 @@ Page({
         if (totalDistance <= 0) {
             return []; // 返回一个空数组
         }
-        // 计算每公里配速递减的值
-        const decreasePerKm = (initialPace - sprintPace) / totalDistance;
+        // 计算每公里配速递减或递增的值
+        const decreasePerKm = (initialPace - sprintPace) / (totalDistance - 1);
         // 初始化每公里配速数组
         let paceData = [];
-
-        // 计算每公里的配速
+        // 当前公里配速
         let currentPace = initialPace;
+        // 当前公里数
         let currentDistance = 0;
         // 初始化累计用时
         let cumulativeTime = 0;
-        let flexWidthVal = 0.8;//设定初始宽度
+        //设定样式初始宽度
+        let flexWidthVal = 0.8;
+        // 是否不足一公里
+        let isLessThanOneKm = false;
+        // 是否最快
+        let isFast = false;
 
         while (currentDistance < totalDistance) {
-            let nextDistance = currentDistance + 1; // 下一个目标公里数
-            const paceForThisSegment = currentPace; // 当前段的配速
+            // 下一个目标公里数
+            let nextDistance = currentDistance + 1;
+            // 当前段的配速 --- 这个变量有用 别乱改
+            const paceForThisSegment = currentPace;
 
             // 如果达到或超过总距离，调整配速和距离
             if (nextDistance >= totalDistance) {
+                currentPace = sprintPace;// 计算下一段的配速
                 nextDistance = totalDistance;
-                console.log("currentDistance: " + currentDistance);
-                console.log("nextDistance: " + nextDistance);
                 //更新累计用时 右侧为不足一公里用时
                 cumulativeTime += currentPace * (nextDistance - currentDistance);
-                console.log(decreasePerKm);
+                if (nextDistance - currentDistance < 1) {
+                    isLessThanOneKm = true;
+                }
+
             } else {
                 cumulativeTime += currentPace;//更新累计用时
+                currentPace -= decreasePerKm;// 计算下一段的配速
             }
-            currentPace -= decreasePerKm;// 计算下一段的配速
-            flexWidthVal = 0.8 * (currentPace / initialPace);
 
+            // 这里的逻辑应该是 不管它是正还是负都用剩余的宽度做加减计算
+            if (decreasePerKm > 0) {
+                flexWidthVal -= 0.17 / Math.ceil(totalDistance);
+            } else {
+                flexWidthVal += 0.17 / Math.ceil(totalDistance);
 
-            // console.log(common.isInteger(nextDistance));
-            // console.log(nextDistance + " : " + currentPace + " : " + sprintPace + " : " + decreasePerKm + " : " + (sprintPace - decreasePerKm));
-            // console.log(sprintPace);
-            // console.log(decreasePerKm);
+            }
             // 将当前段的配速和距离添加到数组中
             paceData.push({
                 km: nextDistance,
                 pace: paceForThisSegment,
-                // isFast: currentPace <= sprintPace, // 如果当前配速等于冲刺配速，则为最快
-                isFast: common.isInteger(nextDistance) ? sprintPace > currentPace - decreasePerKm : false, // 如果当前配速等于冲刺配速，则为最快
+                currentKmTime: isLessThanOneKm ?
+                    currentPace * (nextDistance - currentDistance) :
+                    paceForThisSegment,//当前段距离用时
+                isLessThanOneKm: isLessThanOneKm,
+                isFast: isFast,
                 cumulativeTime: cumulativeTime,
                 flexWidthVal: flexWidthVal
             });
 
+
+            // 当最后一公里小于1时 找到最快配速并重新更新数据
+            if (nextDistance >= totalDistance) {
+                const minPaceIndex = paceData.reduce((minIndex, current, currentIndex, array) => {
+                    // 只有当 current.isLessThanOneKm 不为 true 时才进行比较
+                    if (!current.isLessThanOneKm && current.pace < array[minIndex].pace) {
+                        return currentIndex;
+                    }
+                    return minIndex;
+                }, 0);
+
+                // 确保找到的下标对应的元素满足 isLessThanOneKm != true
+                if (!paceData[minPaceIndex].isLessThanOneKm) {
+                    paceData[minPaceIndex].isFast = true;
+                }
+            }
 
             // 如果当前距离大于5公里，计算最近五公里的用时
             if (nextDistance > 5) {
                 const nearFiveKmPaces = paceData.slice(-5).map(p => p.pace);
                 const nearFiveKmTime = nearFiveKmPaces.reduce((acc, pace) => acc + pace, 0);
                 paceData[paceData.length - 1].nearFiveKmTime = nearFiveKmTime;
-                console.log("nearFiveKmTime: " + nearFiveKmTime);
             }
 
             // 更新当前距离
@@ -128,7 +156,7 @@ Page({
     },
 
     /**
-     * 
+     * 为头部距离赋值
      * @param {*} distance 
      */
     determineDistanceType(distance) {

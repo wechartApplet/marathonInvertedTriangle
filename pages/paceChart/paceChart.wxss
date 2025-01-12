@@ -78,8 +78,11 @@
 .dark {
     background-color: rgba(234, 251, 245);
     border-radius: 15px;
-    padding: 8px 0;
     display: flex;
+}
+
+.pace_row_tr {
+    padding: 8px 0;
 }
 
 .dark>.pace-value {
