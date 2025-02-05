@@ -1,33 +1,8 @@
 <scroll-view class="scrollarea" scroll-y type="list">
     <view class="container">
-        <view class="input-group">
-            <text>初始配速(几分几秒每公里):</text>
-            <picker mode="selector" range="{{timeOptions}}" bindchange="bindPickerChange" value="{{initialTimeIndex}}" data-type="initial">
-                <view class="picker">
-                    <text>{{timeOptions[initialTimeIndex]}}</text>
-                </view>
-            </picker>
-        </view>
-        <view class="input-group">
-            <text>冲刺配速 (几分几秒每公里):</text>
-            <picker mode="selector" range="{{timeOptions}}" bindchange="bindPickerChange" value="{{sprintTimeIndex}}" data-type="sprint">
-                <view class="picker">
-                    <text>{{timeOptions[sprintTimeIndex]}}</text>
-                </view>
-            </picker>
-        </view>
-
-        <view class="input-group">
-            <text>计划运动距离(以km为单位):</text>
-            <picker mode="selector" range="{{distanceOptions}}" bindchange="bindPickerChange" value="{{distanceIndex}}" data-type="distance">
-                <view class="picker">
-                    <text>{{distanceOptions[distanceIndex]}}</text>
-                </view>
-            </picker>
-        </view>
-
-
-        <button class="calculate-pace-button" bindtap="calculatePace">提交</button>
+        <block wx:for="{{pickerItems}}" wx:key="type">
+            <PickerItem label="{{item.label}}" options="{{item.options}}" selectedIndex="{{item.selectedIndex}}" type="{{item.type}}" bind:change="bindPickerChange" />
+        </block>
+        <SubmitButton text="{{submitButtonLabel}}" bind:tap="calculatePace" />
     </view>
-
 </scroll-view>

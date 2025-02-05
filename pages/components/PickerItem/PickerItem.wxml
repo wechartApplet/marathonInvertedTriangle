@@ -1,0 +1,8 @@
+<view class="input-group">
+    <text>{{label}}</text>
+    <picker mode="selector" range="{{options}}" bindchange="onPickerChange" value="{{selectedIndex}}" data-type="{{type}}">
+        <view class="picker">
+            <text>{{options[selectedIndex]}}</text>
+        </view>
+    </picker>
+</view>

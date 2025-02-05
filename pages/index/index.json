@@ -1,6 +1,7 @@
 {
-  "navigationBarTitleText": "马拉松倒三角配速计划生成器",
-  "usingComponents": {
-  }
+    "navigationBarTitleText": "马拉松倒三角配速计划生成器",
+    "usingComponents": {
+        "PickerItem": "/pages/components/PickerItem/PickerItem",
+        "SubmitButton": "/pages/components/SubmitButton/SubmitButton"
+    }
 }
-

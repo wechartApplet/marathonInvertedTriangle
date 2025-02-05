@@ -1,0 +1,7 @@
+.calculate_pace_button {
+    background-color: #1aad19;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+}
