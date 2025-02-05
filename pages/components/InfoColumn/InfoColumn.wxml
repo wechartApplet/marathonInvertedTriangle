@@ -1,0 +1,4 @@
+<view class="info-column" wx:if="{{toggle}}">
+    <text class="info-value">{{value}}</text>
+    <text class="info-label">{{label}}</text>
+</view>

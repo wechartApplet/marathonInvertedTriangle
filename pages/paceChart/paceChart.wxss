@@ -1,28 +1,4 @@
-/* paceChart.wxss */
-/* .pace-chart {
-    display: flex;
-    flex-direction: column;
-}
 
-.pace-bar {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-}
-
-.pace-bar-inner {
-    flex: 1;
-    background-color: #00bfff;
-    color: white;
-    padding: 5px;
-    border-radius: 5px;
-}
-
-.special-text,
-.cumulative-time {
-    font-size: 14px;
-    color: #666;
-} */
 
 
 

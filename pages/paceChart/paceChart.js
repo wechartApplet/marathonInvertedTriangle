@@ -9,7 +9,7 @@ Page({
      * 页面的初始数据
      */
     data: {
-
+        infoColumns: []
     },
 
     /**
@@ -40,10 +40,6 @@ Page({
         const timeDescription = this.determineDistanceType(totalDistance);
         // 为页面变量赋值
         this.setData({
-            timeDescription: timeDescription,
-            totalTime: common.formatTime(Math.ceil(totalTimeSeconds)),// 向上取整
-            fastestPace: common.convertTimeFormat(common.formatTime(sprintPace)),
-            averagePace: common.convertTimeFormat(this.calculateAveragePace(paceData)),
             paceData: paceData.map(pace => ({
                 km: pace.km,
                 pace: common.convertTimeFormat(common.formatTime(Math.round(pace.pace))),//四舍五入
@@ -54,6 +50,23 @@ Page({
                 nearFiveKmTime: common.formatTimeHour(Math.round(pace.nearFiveKmTime)),
                 flexWidthVal: pace.flexWidthVal
             })),
+            infoColumns: [
+                {
+                    toggle: !!timeDescription,
+                    value: common.formatTime(Math.ceil(totalTimeSeconds)),
+                    label: `${timeDescription}用时`
+                },
+                {
+                    toggle: true,
+                    value: common.convertTimeFormat(common.formatTime(sprintPace)),
+                    label: '最快配速'
+                },
+                {
+                    toggle: true,
+                    value: common.convertTimeFormat(this.calculateAveragePace(paceData)),
+                    label: '平均配速'
+                }
+            ]
         });
     },
 

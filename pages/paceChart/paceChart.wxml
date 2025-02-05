@@ -1,16 +1,7 @@
 <view class="summary">
-    <view class="info-column" wx:if="{{timeDescription}}">
-        <text class="info-value">{{totalTime}}</text>
-        <text class="info-label">{{timeDescription}}用时</text>
-    </view>
-    <view class="info-column">
-        <text class="info-value">{{fastestPace}}</text>
-        <text class="info-label">最快配速</text>
-    </view>
-    <view class="info-column">
-        <text class="info-value">{{averagePace}}</text>
-        <text class="info-label">平均配速</text>
-    </view>
+    <block wx:for="{{infoColumns}}" wx:key="index" wx:if="{{item.toggle}}">
+        <InfoColumn toggle="{{item.toggle}}" value="{{item.value}}" label="{{item.label}}" />
+    </block>
 </view>
 
 <view class="pace-chart">
