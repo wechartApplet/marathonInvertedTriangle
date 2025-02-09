@@ -26,7 +26,7 @@
                 <view class="time-details" wx:if="{{item.km % 5 == 0 || item.isLessThanOneKm}}">
                     <text wx:if="{{item.km % 5 == 0}}">{{item.km}}{{item.cumulativeTimeText}} {{item.cumulativeTime}}</text>
                     <text wx:if="{{item.km % 5 == 0 && item.km != 5}}">{{item.nearFiveKmTimeText}} {{item.nearFiveKmTime}}</text>
-                    <text wx:if="{{item.isLessThanOneKm}}">{{{item.isLessThanOneKmText}}} {{item.currentKmTime}}</text>
+                    <text wx:if="{{item.isLessThanOneKm}}">{{item.isLessThanOneKmText}} {{item.currentKmTime}}</text>
                 </view>
             </view>
         </view>

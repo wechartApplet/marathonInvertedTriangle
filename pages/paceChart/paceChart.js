@@ -150,7 +150,6 @@ Page({
                 flexWidthVal -= 0.17 / Math.ceil(totalDistance);
             } else {//用户给的速度是由快变慢
                 flexWidthVal += 0.17 / Math.ceil(totalDistance);
-
             }
             // 将当前段的配速和距离添加到数组中
             paceData.push({

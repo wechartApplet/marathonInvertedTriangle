@@ -38,7 +38,6 @@ Page({
         // 加载时将生成的时间值和距离值进行对应的赋值
         const timeOptions = timePicker.generateTimeList();
         const distanceOptions = distancePicker.generateDistanceOptions();
-        console.log(timeOptions);
         const pickerItems = this.data.pickerItems.map(item => {
             if (item.type === 'initial' || item.type === 'sprint') {
                 return { ...item, options: timeOptions };//迭代item元素并将timeOptions里的元素值命名为options重新赋值给item
