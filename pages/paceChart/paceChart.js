@@ -32,7 +32,6 @@ Page({
     calculatePaceData(totalDistance, initialPace, sprintPace) {
         //将接收到的前一个页面传递过来的参数传给专门计算的方法
         const paceData = this.calculatePace(initialPace, sprintPace, totalDistance);
-        console.log(paceData);
         if (!paceData || paceData.length === 0) {
             console.error('Pace data is empty or undefined');
             return; // 退出方法，避免进一步的错误
@@ -108,7 +107,11 @@ Page({
         // 初始化累计用时
         let cumulativeTime = 0;
         //设定样式初始宽度
-        let flexWidthVal = 0.8;
+        let flexWidthVal = 0.6;//定义一个恒宽度初始值
+        let flexWidthVal_add = 0.5;// 定义一个递增的宽度初始值
+        let flexWidthVal_subtract = 0.9;// 定义一个递减的宽度初始值
+        // 定义宽度步长
+        let step = 0.4;
         // 是否不足一公里
         let isLessThanOneKm = false;
         // 是否最快
@@ -145,11 +148,16 @@ Page({
              * 3. 为保证渲染的图形更加有层次感，建议将 42 公里的数值，分为几个等级，例 0~10，10~20，20~30，30~42
              * 
              * 4. 还需要考虑到 用户给的速度 初始速度与冲刺速度相等的情况
+             * 
              */
             if (decreasePerKm > 0) {//用户给的速度是由慢变快
-                flexWidthVal -= 0.17 / Math.ceil(totalDistance);
-            } else {//用户给的速度是由快变慢
-                flexWidthVal += 0.17 / Math.ceil(totalDistance);
+                flexWidthVal_subtract -= step / Math.ceil(totalDistance);
+                flexWidthVal = flexWidthVal_subtract;
+            } else if (decreasePerKm < 0) {//用户给的速度是由快变慢
+                flexWidthVal_add += step / Math.ceil(totalDistance);
+                flexWidthVal = flexWidthVal_add;
+            } else {//用户给的速度是相等的
+                flexWidthVal = 0.6;
             }
             // 将当前段的配速和距离添加到数组中
             paceData.push({
@@ -189,6 +197,7 @@ Page({
                 const nearFiveKmPaces = paceData.slice(-5).map(p => p.pace);
                 const nearFiveKmTime = nearFiveKmPaces.reduce((acc, pace) => acc + pace, 0);
                 paceData[paceData.length - 1].nearFiveKmTime = nearFiveKmTime;
+                paceData[paceData.length - 1].nearFiveKmTimeText = "近5公里用时";
             }
 
             // 更新当前距离

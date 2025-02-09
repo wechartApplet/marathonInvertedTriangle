@@ -1,7 +1,6 @@
 {
     "navigationBarTitleText": "马拉松倒三角配速计划生成器",
     "usingComponents": {
-        "InfoColumn": "/pages/components/InfoColumn/InfoColumn",
-        "PaceColumn": "/pages/components/PaceColumn/PaceColumn"
+        "InfoColumn": "/pages/components/InfoColumn/InfoColumn"
     }
 }
