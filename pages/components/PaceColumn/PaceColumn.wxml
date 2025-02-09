@@ -1,0 +1,5 @@
+<view class="{{containerClass}}" wx:if="{{show}}">
+    <block wx:for="{{texts}}" wx:key="index" wx:if="{{item.show}}">
+        <text class="{{item.textClass}}">{{item.text}}</text>
+    </block>
+</view>

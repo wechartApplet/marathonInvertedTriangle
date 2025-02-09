@@ -7,12 +7,9 @@
 <view class="pace-chart">
     <!-- 表头行 -->
     <view class="pace-row header">
-        <view class="pace-column km-column">
-            <text class="km-label">公里</text>
-        </view>
-        <view class="pace-column speed-column">
-            <text class="speed-label">配速</text>
-        </view>
+        <block wx:for="{{paceRowHeaders}}" wx:key="index" wx:if="{{item.show}}">
+            <PaceColumn containerClass="{{item.containerClass}}" show="{{item.show}}" texts="{{item.texts}}" />
+        </block>
     </view>
     <!-- 数据行 -->
     <block wx:for="{{paceData}}" wx:key="index">

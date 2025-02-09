@@ -1,0 +1,9 @@
+.km-column {
+    flex: 0.2;
+    margin-left: 4%;
+}
+
+.speed-column {
+    flex: 0.8;
+    margin-left: 1%;
+}

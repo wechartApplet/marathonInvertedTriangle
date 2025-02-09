@@ -9,7 +9,8 @@ Page({
      * 页面的初始数据
      */
     data: {
-        infoColumns: []
+        infoColumns: [],// 头部html内容
+        paceRowHeaders: [],//表格的头部内容
     },
 
     /**
@@ -65,6 +66,30 @@ Page({
                     toggle: true,
                     value: common.convertTimeFormat(this.calculateAveragePace(paceData)),
                     label: '平均配速'
+                }
+            ],
+            paceRowHeaders: [
+                {
+                    containerClass: "pace-column km-column",
+                    show: true,
+                    texts: [
+                        {
+                            show: true,
+                            textClass: "km-label",
+                            text: "公里"
+                        }
+                    ]
+                },
+                {
+                    containerClass: "pace-column speed-column",
+                    show: true,
+                    texts: [
+                        {
+                            show: true,
+                            textClass: "speed-label",
+                            text: "配速"
+                        }
+                    ]
                 }
             ]
         });
