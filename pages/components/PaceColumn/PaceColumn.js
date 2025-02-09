@@ -1,7 +1,4 @@
 Component({
-    // options: {
-    //     styleIsolation: 'shared',
-    // },
     properties: {
         containerClass: {
             type: String,

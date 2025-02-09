@@ -3,12 +3,13 @@
         <InfoColumn toggle="{{item.toggle}}" value="{{item.value}}" label="{{item.label}}" />
     </block>
 </view>
-
 <view class="pace-chart">
     <!-- 表头行 -->
     <view class="pace-row header">
-        <block wx:for="{{paceRowHeaders}}" wx:key="index" wx:if="{{item.show}}">
-            <PaceColumn containerClass="{{item.containerClass}}" show="{{item.show}}" texts="{{item.texts}}" />
+        <block wx:for="{{paceRowHeaders}}" wx:key="index">
+            <view class="pace-column {{item.viewClass}}">
+                <text class="{{item.textClass}}">{{item.textVal}}</text>
+            </view>
         </block>
     </view>
     <!-- 数据行 -->
@@ -20,12 +21,12 @@
             <view class="pace-column paceChart-column pace-block-container">
                 <view class="pace-block dark {{item.isFast ? 'pace-isfast_bg' : ''}}" wx:if="{{!item.isLessThanOneKm}}">
                     <text class="pace-value {{item.isFast ? 'pace-value_isfast' : ''}}" style="{{'flex: ' +item.flexWidthVal}}">{{(item.pace)}}</text>
-                    <text wx:if="{{item.isFast}}" class="pace-isfast" style="{{'flex: ' + (1- item.flexWidthVal)}}">最快</text>
+                    <text wx:if="{{item.isFast}}" class="pace-isfast" style="{{'flex: ' + (1- item.flexWidthVal)}}">{{item.isFastText}}</text>
                 </view>
                 <view class="time-details" wx:if="{{item.km % 5 == 0 || item.isLessThanOneKm}}">
-                    <text wx:if="{{item.km % 5 == 0}}">{{item.km}}公里累计用时 {{item.cumulativeTime}}</text>
-                    <text wx:if="{{item.km % 5 == 0 && item.km != 5}}">近5公里用时 {{item.nearFiveKmTime}}</text>
-                    <text wx:if="{{item.isLessThanOneKm}}">最后不足一公里用时 {{item.currentKmTime}}</text>
+                    <text wx:if="{{item.km % 5 == 0}}">{{item.km}}{{item.cumulativeTimeText}} {{item.cumulativeTime}}</text>
+                    <text wx:if="{{item.km % 5 == 0 && item.km != 5}}">{{item.nearFiveKmTimeText}} {{item.nearFiveKmTime}}</text>
+                    <text wx:if="{{item.isLessThanOneKm}}">{{{item.isLessThanOneKmText}}} {{item.currentKmTime}}</text>
                 </view>
             </view>
         </view>

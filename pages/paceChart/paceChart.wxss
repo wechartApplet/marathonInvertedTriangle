@@ -14,30 +14,42 @@
     display: flex;
 }
 
-.pace-chart>view>view:first-child {
+/** 头部样式*/
+.header {
+    margin-bottom: 10px;
+    color: rgba(179, 179, 179);
+    justify-content: space-around;
+}
+
+.km-column {
+    flex: 0.2;
+    margin-left: 3%;
+}
+
+.speed-column {
+    flex: 0.8;
+    margin-left: 5%;
+}
+
+/**表格内容样式*/
+.pace_row_tr {
+    padding: 8px 0;
+}
+
+.pace-chart>.pace_row_tr>.pace-column:first-child {
     flex: 0.2;
     margin-left: 7%;
 }
 
-.pace-chart>view>view:last-child {
+.pace-chart>.pace_row_tr>.pace-column:last-child {
     flex: 0.8;
     margin-right: 7%;
-}
-
-
-.header {
-    margin-bottom: 10px;
-    color: rgba(179, 179, 179);
 }
 
 .dark {
     background-color: rgba(234, 251, 245);
     border-radius: 15px;
     display: flex;
-}
-
-.pace_row_tr {
-    padding: 8px 0;
 }
 
 .dark>.pace-value {
@@ -68,7 +80,7 @@
     background-color: rgb(255, 239, 239);
 }
 
-
+/** 五公里处的文字*/
 .time-details {
     display: flex;
     /* 允许内容换行 */

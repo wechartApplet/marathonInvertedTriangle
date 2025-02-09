@@ -1,9 +1,11 @@
-.km-column {
-    flex: 0.2;
-    margin-left: 4%;
+.header .km-column {
+    /* flex: 0.2;
+    background-color: lightblue; */
+    /* 添加背景颜色以便调试 */
+    /* margin-left: 4%; */
 }
 
-.speed-column {
-    flex: 0.8;
-    margin-left: 1%;
+.header .speed-column {
+    /* flex: 0.8; */
+    /* margin-left: 1%; */
 }

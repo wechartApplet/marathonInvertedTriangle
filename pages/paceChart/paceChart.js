@@ -22,7 +22,6 @@ Page({
         const initialPaceSeconds = parseInt(optionsData.initialTime, 10);
         const sprintPaceSeconds = parseInt(optionsData.sprintTime, 10);
         this.calculatePaceData(totalDistanceKm, initialPaceSeconds, sprintPaceSeconds);
-        // 检查这个值是否如预期
     },
     /**
      * 接收前一个页面传递过来的参数进行计算
@@ -33,6 +32,7 @@ Page({
     calculatePaceData(totalDistance, initialPace, sprintPace) {
         //将接收到的前一个页面传递过来的参数传给专门计算的方法
         const paceData = this.calculatePace(initialPace, sprintPace, totalDistance);
+        console.log(paceData);
         if (!paceData || paceData.length === 0) {
             console.error('Pace data is empty or undefined');
             return; // 退出方法，避免进一步的错误
@@ -46,9 +46,13 @@ Page({
                 pace: common.convertTimeFormat(common.formatTime(Math.round(pace.pace))),//四舍五入
                 currentKmTime: common.formatTimeHour(Math.ceil(pace.currentKmTime)),
                 isFast: pace.isFast,
+                isFastText: pace.isFastText,
                 isLessThanOneKm: pace.isLessThanOneKm,
+                isLessThanOneKmText: pace.isLessThanOneKmText,
                 cumulativeTime: common.formatTimeHour(Math.round(pace.cumulativeTime)),
+                cumulativeTimeText: pace.cumulativeTimeText,
                 nearFiveKmTime: common.formatTimeHour(Math.round(pace.nearFiveKmTime)),
+                nearFiveKmTimeText: pace.nearFiveKmTimeText,
                 flexWidthVal: pace.flexWidthVal
             })),
             infoColumns: [
@@ -70,26 +74,14 @@ Page({
             ],
             paceRowHeaders: [
                 {
-                    containerClass: "pace-column km-column",
-                    show: true,
-                    texts: [
-                        {
-                            show: true,
-                            textClass: "km-label",
-                            text: "公里"
-                        }
-                    ]
+                    viewClass: "km-column",
+                    textClass: "km-label",
+                    textVal: "公里"
                 },
                 {
-                    containerClass: "pace-column speed-column",
-                    show: true,
-                    texts: [
-                        {
-                            show: true,
-                            textClass: "speed-label",
-                            text: "配速"
-                        }
-                    ]
+                    viewClass: "speed-column",
+                    textClass: "speed-label",
+                    textVal: "配速"
                 }
             ]
         });
@@ -144,9 +136,19 @@ Page({
             }
 
             // 这里的逻辑应该是 不管它是正还是负都用剩余的宽度做加减计算
-            if (decreasePerKm > 0) {
+            /**
+             * 此处应该优化方法，使宽度渲染得更加美丽
+             * 1. 如果速度是由慢变快，那么展示图形是 倒三角，则设置初始宽度为 最大，依次 递减 宽度
+             * 
+             * 2. 如果速度是由快变慢，那么展示图形是 正三角，则设置始始宽度为 最小，依次 递增 宽度
+             * 
+             * 3. 为保证渲染的图形更加有层次感，建议将 42 公里的数值，分为几个等级，例 0~10，10~20，20~30，30~42
+             * 
+             * 4. 还需要考虑到 用户给的速度 初始速度与冲刺速度相等的情况
+             */
+            if (decreasePerKm > 0) {//用户给的速度是由慢变快
                 flexWidthVal -= 0.17 / Math.ceil(totalDistance);
-            } else {
+            } else {//用户给的速度是由快变慢
                 flexWidthVal += 0.17 / Math.ceil(totalDistance);
 
             }
@@ -158,8 +160,11 @@ Page({
                     currentPace * (nextDistance - currentDistance) :
                     paceForThisSegment,//当前段距离用时
                 isLessThanOneKm: isLessThanOneKm,
+                isLessThanOneKmText: "最后不足一公里用时",
                 isFast: isFast,
+                isFastText: "最快",
                 cumulativeTime: cumulativeTime,
+                cumulativeTimeText: "公里累计用时",
                 flexWidthVal: flexWidthVal
             });
 
