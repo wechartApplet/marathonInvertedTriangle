@@ -61,18 +61,16 @@
     font-weight: bold;
 }
 
-/* 要与.pace-value保持一致 否则字体无法垂直居中 */
-.dark>.pace-isfast {
-    padding: 5px 10px;
-}
-
 .dark>text.pace-value_isfast {
     background-color: rgb(254, 146, 73);
     background: linear-gradient(to right, rgb(254, 146, 73), rgb(255, 76, 46), );
 }
 
 .pace-isfast {
-    padding-left: 5%;
+    /* 要与.pace-value保持一致 否则字体无法垂直居中 */
+    padding: 5px 0px;
+    /* 使用 text-indent 偏移文字 */
+    text-indent: 10px;
     color: rgba(254, 103, 58);
 }
 
