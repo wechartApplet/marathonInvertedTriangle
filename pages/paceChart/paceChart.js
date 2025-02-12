@@ -62,7 +62,7 @@ Page({
                 },
                 {
                     toggle: true,
-                    value: common.convertTimeFormat(common.formatTime(sprintPace)),
+                    value: common.convertTimeFormat(common.formatTime(initialPace - sprintPace > 0 ? sprintPace : initialPace)),
                     label: '最快配速'
                 },
                 {
