@@ -70,6 +70,7 @@
 |   +- utils -- 存放工具函数的目录，包含一些通用的辅助函数。
 |   |   +- common.js -- 通用工具函数，如时间格式化、数据转换等。
 |   |   +- distancePicker.js -- 距离选择器的工具函数。
+|   |   +- share.js -- 分享的工具函数。
 |   |   +- timePicker.js -- 时间选择器的工具函数。
 |   |   +- util.js -- 其他通用工具函数。
 ```
@@ -91,7 +92,7 @@
 
 ### 项目二维码
 
-![](./Images/index.jpg)
+![](./Images/index.png)
 
 ### 通过此项目GET
 

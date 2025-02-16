@@ -7,6 +7,8 @@ const timePicker = require('../../utils/timePicker.js');
 const distancePicker = require('../../utils/distancePicker.js');
 // 导入公共的函数
 const common = require('../../utils/common.js');
+// 导入分享的函数
+const share = require('../../utils/share.js');
 
 Page({
     data: {
@@ -35,6 +37,11 @@ Page({
         submitButtonLabel: '提交'
     },
     onLoad: function () {
+        // 分享到好友和朋友圈
+        wx.showShareMenu({
+            withShareTicket: true,
+            menus: ['shareAppMessage', 'shareTimeline']
+        });
         // 加载时将生成的时间值和距离值进行对应的赋值
         const timeOptions = timePicker.generateTimeList();
         const distanceOptions = distancePicker.generateDistanceOptions();
@@ -118,5 +125,13 @@ Page({
         wx.navigateTo({
             url: '/pages/paceChart/paceChart?paceData=' + paceDataString
         });
+    },
+    // 分享到好友
+    onShareAppMessage() {
+        return share.getShareAppMessage();
+    },
+    // 分享到朋友圈
+    onShareTimeline() {
+        return share.getShareTimeline();
     }
 });

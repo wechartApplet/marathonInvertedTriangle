@@ -1,6 +1,7 @@
 // 导入公共的函数
 const common = require('../../utils/common.js');
-
+// 导入分享的函数
+const share = require('../../utils/share.js');
 
 
 Page({
@@ -17,6 +18,11 @@ Page({
      * 生命周期函数--监听页面加载
      */
     onLoad(options) {
+        // 分享到好友和朋友圈
+        wx.showShareMenu({
+            withShareTicket: true,
+            menus: ['shareAppMessage', 'shareTimeline']
+        });
         const optionsData = JSON.parse(decodeURIComponent(options.paceData));
         const totalDistanceKm = parseFloat(optionsData.distance);
         const initialPaceSeconds = parseInt(optionsData.initialTime, 10);
@@ -270,11 +276,12 @@ Page({
     onReachBottom() {
 
     },
-
-    /**
-     * 用户点击右上角分享
-     */
+    // 分享到好友 用户点击右上角分享
     onShareAppMessage() {
-
+        return share.getShareAppMessage();
+    },
+    // 分享到朋友圈
+    onShareTimeline() {
+        return share.getShareTimeline();
     }
 })
