@@ -278,10 +278,10 @@ Page({
     },
     // 分享到好友 用户点击右上角分享
     onShareAppMessage() {
-        return share.getShareAppMessage();
+
     },
     // 分享到朋友圈
     onShareTimeline() {
-        return share.getShareTimeline();
+
     }
 })
