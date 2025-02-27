@@ -12,13 +12,13 @@ const share = require('../../utils/share.js');
 
 Page({
     data: {
-        timeOptions: [], // 示例时间选项
-        distanceOptions: [], // 示例距离选项
+        timeOptions: [], // 配速时间选项数组
+        distanceOptions: [], // 距离选项数组
         pickerItems: [
             {
                 label: '初始配速(几分几秒每公里):',
-                options: [],
-                selectedIndex: 0,
+                options: [], // 存储初始配速的可选值
+                selectedIndex: 0, // 当前选中的初始配速索引
                 type: 'initial'
             },
             {
@@ -38,10 +38,10 @@ Page({
     },
     onLoad: function () {
         // 分享到好友和朋友圈
-        wx.showShareMenu({
-            withShareTicket: true,
-            menus: ['shareAppMessage', 'shareTimeline']
-        });
+        // wx.showShareMenu({
+        //     withShareTicket: true,
+        //     menus: ['shareAppMessage', 'shareTimeline']
+        // });
         // 加载时将生成的时间值和距离值进行对应的赋值
         const timeOptions = timePicker.generateTimeList();
         const distanceOptions = distancePicker.generateDistanceOptions();
@@ -63,8 +63,9 @@ Page({
         this.setDefaultIndices();
     },
 
-    // 设置默认的初始配速 和 冲刺配速 和 运动距离
+    // 设置默认的初始配速、冲刺配速和运动距离的索引值
     setDefaultIndices: function () {
+        // 获取默认值在数组中的索引位置
         const initialIndex = common.getIndex('06:30', this.data.timeOptions);
         const sprintIndex = common.getIndex('04:30', this.data.timeOptions);
         const distanceIndex = common.getIndex(21.0975, this.data.distanceOptions);
@@ -121,17 +122,17 @@ Page({
         // 6. 将数组序列化
         let paceDataString = encodeURIComponent(JSON.stringify(paceDataObj));
 
-        // 7. 跳转页面
-        wx.navigateTo({
+        // 7. 使用redirectTo替代navigateTo，避免页面栈累积
+        wx.redirectTo({
             url: '/pages/paceChart/paceChart?paceData=' + paceDataString
         });
     },
     // 分享到好友
     onShareAppMessage() {
-        return share.getShareAppMessage();
+        // return share.getShareAppMessage();
     },
     // 分享到朋友圈
     onShareTimeline() {
-        return share.getShareTimeline();
+        // return share.getShareTimeline();
     }
 });

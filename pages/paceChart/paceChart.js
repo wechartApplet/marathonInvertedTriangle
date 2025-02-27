@@ -19,10 +19,10 @@ Page({
      */
     onLoad(options) {
         // 分享到好友和朋友圈
-        wx.showShareMenu({
-            withShareTicket: true,
-            menus: ['shareAppMessage', 'shareTimeline']
-        });
+        // wx.showShareMenu({
+        //     withShareTicket: true,
+        //     menus: ['shareAppMessage', 'shareTimeline']
+        // });
         const optionsData = JSON.parse(decodeURIComponent(options.paceData));
         const totalDistanceKm = parseFloat(optionsData.distance);
         const initialPaceSeconds = parseInt(optionsData.initialTime, 10);
@@ -99,6 +99,8 @@ Page({
      * @param {*} totalDistance 
      */
     calculatePace(initialPace, sprintPace, totalDistance) {
+        // 可以使用 Map 或预计算表优化重复计算
+        // 可以考虑使用 Web Worker 处理大量计算
         if (totalDistance <= 0) {
             return []; // 返回一个空数组
         }
@@ -232,9 +234,6 @@ Page({
         return common.formatTime(averageSeconds);
     },
 
-
-
-
     /**
      * 生命周期函数--监听页面初次渲染完成
      */
@@ -278,10 +277,9 @@ Page({
     },
     // 分享到好友 用户点击右上角分享
     onShareAppMessage() {
-
     },
     // 分享到朋友圈
     onShareTimeline() {
+    },
 
-    }
 })
