@@ -66,23 +66,59 @@ function formatTimeHour(seconds) {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-
 /**
- * 将hh:mm格式转换成hh'mm''
- * @param {*} timeStr 
+ * 将任意时间格式转换成 MM'SS'' 格式显示
+ * @param {string} timeStr 输入的时间字符串
+ * @returns {string} 格式化后的时间字符串
  */
 function convertTimeFormat(timeStr) {
-    // 首先，通过冒号":"分割字符串
-    const parts = timeStr.split(':');
-    // 检查分割后的数组长度是否为2，即是否为HH:MM格式
-    if (parts.length === 2) {
-        // 使用模板字符串将小时和分钟转换为HH' MM''格式
-        return `${parts[0]}' ${parts[1]}''`;
-    } else {
-        // 如果格式不正确，抛出错误
-        throw new Error('Invalid time format. Please use HH:MM.');
+    if (!timeStr || typeof timeStr !== 'string') {
+        console.error('Invalid input:', timeStr);
+        return '00\' 00\'\'';
     }
+
+    // 移除所有空格
+    timeStr = timeStr.trim();
+
+    // 处理只有秒的情况
+    if (!timeStr.includes(':')) {
+        const seconds = parseInt(timeStr, 10);
+        if (isNaN(seconds)) {
+            console.error('Invalid seconds:', timeStr);
+            return '00\' 00\'\'';
+        }
+        return `00' ${seconds.toString().padStart(2, '0')}''`;
+    }
+
+    // 分割时间字符串
+    const parts = timeStr.split(':');
+
+    // 处理 HH:MM:SS 格式
+    if (parts.length === 3) {
+        const minutes = parseInt(parts[1], 10);
+        const seconds = parseInt(parts[2], 10);
+        if (isNaN(minutes) || isNaN(seconds)) {
+            console.error('Invalid HH:MM:SS format:', timeStr);
+            return '00\' 00\'\'';
+        }
+        return `${minutes.toString().padStart(2, '0')}' ${seconds.toString().padStart(2, '0')}''`;
+    }
+
+    // 处理 MM:SS 格式
+    if (parts.length === 2) {
+        const minutes = parseInt(parts[0], 10);
+        const seconds = parseInt(parts[1], 10);
+        if (isNaN(minutes) || isNaN(seconds)) {
+            console.error('Invalid MM:SS format:', timeStr);
+            return '00\' 00\'\'';
+        }
+        return `${minutes.toString().padStart(2, '0')}' ${seconds.toString().padStart(2, '0')}''`;
+    }
+
+    console.error('Unsupported time format:', timeStr);
+    return '00\' 00\'\'';
 }
+
 /**
  * 判断是否为整数
  * @param {*} num 

@@ -2,81 +2,140 @@
 const common = require('../../utils/common.js');
 // 导入分享的函数
 const share = require('../../utils/share.js');
+// 导入缓存管理工具
+const cacheManager = require('../../utils/cache.js');
+// 导入样式处理工具
+const styleHelper = require('../../utils/styleHelper.js');
 
-
+/**
+ * 配速图表页面
+ * 展示马拉松配速的详细计划，包括每公里配速、累计用时等信息
+ */
 Page({
-
     /**
      * 页面的初始数据
      */
     data: {
-        infoColumns: [],// 头部html内容
-        paceRowHeaders: [],//表格的头部内容
+        infoColumns: [], // 头部展示区域的数据，包括总用时、最快配速等
+        paceRowHeaders: [], // 表格的头部内容，包括"公里"和"配速"列
     },
 
     /**
      * 生命周期函数--监听页面加载
+     * @param {Object} options 页面参数，包含encoded的配速数据
      */
     onLoad(options) {
-        // 分享到好友和朋友圈
-        // wx.showShareMenu({
-        //     withShareTicket: true,
-        //     menus: ['shareAppMessage', 'shareTimeline']
-        // });
+        console.log('paceChart onLoad');
+        // 开启分享功能
+        wx.showShareMenu({
+            withShareTicket: true,
+            menus: ['shareAppMessage', 'shareTimeline']
+        });
+
+        // 解析从上一个页面传递过来的参数
         const optionsData = JSON.parse(decodeURIComponent(options.paceData));
         const totalDistanceKm = parseFloat(optionsData.distance);
         const initialPaceSeconds = parseInt(optionsData.initialTime, 10);
         const sprintPaceSeconds = parseInt(optionsData.sprintTime, 10);
+
+        // 根据参数计算配速数据
         this.calculatePaceData(totalDistanceKm, initialPaceSeconds, sprintPaceSeconds);
     },
+
+    onShow() {
+        console.log('paceChart onShow');
+    },
+
+    onHide() {
+        console.log('paceChart onHide');
+    },
+
+    onUnload() {
+        console.log('paceChart onUnload');
+    },
+
     /**
-     * 接收前一个页面传递过来的参数进行计算
-     * @param {*} totalDistance 
-     * @param {*} initialPace 
-     * @param {*} sprintPace 
+     * 主要的配速数据计算入口
+     * 接收前一个页面传递过来的参数进行计算，并更新页面数据
+     * @param {number} totalDistance 总距离（公里）
+     * @param {number} initialPace 初始配速（秒）
+     * @param {number} sprintPace 冲刺配速（秒）
      */
     calculatePaceData(totalDistance, initialPace, sprintPace) {
-        //将接收到的前一个页面传递过来的参数传给专门计算的方法
-        const paceData = this.calculatePace(initialPace, sprintPace, totalDistance);
-        if (!paceData || paceData.length === 0) {
-            console.error('Pace data is empty or undefined');
-            return; // 退出方法，避免进一步的错误
+        // 尝试从缓存获取计算结果
+        const cacheKey = cacheManager.generateKey(initialPace, sprintPace, totalDistance);
+        const cachedResult = cacheManager.getPaceCalculation(cacheKey);
+
+        // 如果有缓存结果，直接使用
+        if (cachedResult) {
+            this.setData(cachedResult);
+            return;
         }
+
+        // 计算配速数据
+        const paceData = this.calculatePace(initialPace, sprintPace, totalDistance);
+
+        // 验证计算结果
+        if (!paceData || paceData.length === 0) {
+            wx.showToast({
+                title: '配速计算失败',
+                icon: 'none',
+                duration: 2000
+            });
+            return;
+        }
+
+        // 计算总用时（累加每段配速）
         const totalTimeSeconds = paceData.reduce((acc, { pace }) => acc + pace, 0);
+        // 获取距离类型描述（全马/半马）
         const timeDescription = this.determineDistanceType(totalDistance);
-        // 为页面变量赋值
-        this.setData({
-            paceData: paceData.map(pace => ({
-                km: pace.km,
-                pace: common.convertTimeFormat(common.formatTime(Math.round(pace.pace))),//四舍五入
-                currentKmTime: common.formatTimeHour(Math.ceil(pace.currentKmTime)),
-                isFast: pace.isFast,
-                isFastText: pace.isFastText,
-                isLessThanOneKm: pace.isLessThanOneKm,
-                isLessThanOneKmText: pace.isLessThanOneKmText,
-                cumulativeTime: common.formatTimeHour(Math.round(pace.cumulativeTime)),
-                cumulativeTimeText: pace.cumulativeTimeText,
-                nearFiveKmTime: common.formatTimeHour(Math.round(pace.nearFiveKmTime)),
-                nearFiveKmTimeText: pace.nearFiveKmTimeText,
-                flexWidthVal: pace.flexWidthVal
-            })),
+
+        // 准备页面显示数据
+        const pageData = {
+            // 配速数据转换，添加显示所需的额外信息
+            paceData: paceData.map(pace => {
+                // 确保配速格式为 MM:SS
+                const paceTimeStr = common.formatTime(Math.round(pace.pace));
+                // 如果返回的是单个数字，转换为 MM:SS 格式
+                const formattedPaceTime = paceTimeStr.includes(':') ? paceTimeStr : `00:${paceTimeStr.padStart(2, '0')}`;
+
+                const formattedPace = {
+                    km: pace.km,                    // 当前公里数
+                    pace: common.convertTimeFormat(formattedPaceTime),  // 配速
+                    currentKmTime: common.formatTimeHour(Math.ceil(pace.currentKmTime)),      // 当前公里用时
+                    isFast: pace.isFast,           // 是否为最快配速
+                    isFastText: "最快",            // 最快配速标记文本
+                    isLessThanOneKm: pace.isLessThanOneKm,  // 是否为不足一公里
+                    isLessThanOneKmText: "最后不足一公里用时",
+                    cumulativeTime: common.formatTimeHour(Math.round(pace.cumulativeTime)),   // 累计用时
+                    cumulativeTimeText: "公里累计用时",
+                    nearFiveKmTime: pace.nearFiveKmTime ? common.formatTimeHour(Math.round(pace.nearFiveKmTime)) : '', // 近5公里用时
+                    nearFiveKmTimeText: "近5公里用时",
+                    flexWidthVal: pace.flexWidthVal // 控制配速块显示宽度的值
+                };
+                return formattedPace;
+            }),
+            // 头部信息栏数据
             infoColumns: [
                 {
-                    toggle: !!timeDescription,
-                    value: common.formatTime(Math.ceil(totalTimeSeconds)),
-                    label: `${timeDescription}用时`
+                    toggle: !!timeDescription,  // 是否显示
+                    value: common.formatTimeHour(Math.ceil(totalTimeSeconds)),  // 总用时
+                    label: `${timeDescription}用时`  // 标签文本
                 },
                 {
                     toggle: true,
-                    value: common.convertTimeFormat(common.formatTime(initialPace - sprintPace > 0 ? sprintPace : initialPace)),
+                    // 确保最快配速格式为 MM:SS
+                    value: common.convertTimeFormat(common.formatTime(initialPace - sprintPace > 0 ? sprintPace : initialPace).padStart(5, '00:')),  // 最快配速
                     label: '最快配速'
                 },
                 {
                     toggle: true,
-                    value: common.convertTimeFormat(this.calculateAveragePace(paceData)),
+                    // 确保平均配速格式为 MM:SS
+                    value: common.convertTimeFormat(this.calculateAveragePace(paceData).padStart(5, '00:')),  // 平均配速
                     label: '平均配速'
                 }
             ],
+            // 表格头部数据
             paceRowHeaders: [
                 {
                     viewClass: "km-column",
@@ -89,134 +148,183 @@ Page({
                     textVal: "配速"
                 }
             ]
-        });
+        };
+
+        // 缓存计算结果供后续使用
+        cacheManager.setPaceCalculation(cacheKey, pageData);
+
+        // 更新页面数据
+        this.setData(pageData);
     },
 
     /**
-     * 根据初始配速、冲刺配速、公里数，生成对应的配速数组
-     * @param {*} initialPace 
-     * @param {*} sprintPace 
-     * @param {*} totalDistance 
+     * 计算每公里配速的递减值
+     * @param {number} initialPace 初始配速（秒）
+     * @param {number} sprintPace 冲刺配速（秒）
+     * @param {number} totalDistance 总距离（公里）
+     * @returns {number} 每公里递减值（秒/公里）
      */
-    calculatePace(initialPace, sprintPace, totalDistance) {
-        // 可以使用 Map 或预计算表优化重复计算
-        // 可以考虑使用 Web Worker 处理大量计算
-        if (totalDistance <= 0) {
-            return []; // 返回一个空数组
-        }
-        // 计算每公里配速递减或递增的值
+    calculateDecreasePerKm(initialPace, sprintPace, totalDistance) {
+        return (initialPace - sprintPace) / (totalDistance - 1);
+    },
+
+    /**
+     * 计算某个距离段的配速数据
+     * 包括该段的配速、用时、累计时间等信息
+     * @param {number} currentDistance 当前距离点（公里）
+     * @param {number} totalDistance 总距离（公里）
+     * @param {number} currentPace 当前配速（秒）
+     * @param {number} cumulativeTime 累计用时（秒）
+     * @param {Array} paceData 已有的配速数据数组
+     * @param {number} initialPace 初始配速（秒）
+     * @param {number} sprintPace 冲刺配速（秒）
+     * @returns {Object} 该距离段的完整配速数据
+     */
+    calculateSegmentPaceData(currentDistance, totalDistance, currentPace, cumulativeTime, paceData, initialPace, sprintPace) {
+        // 计算下一个距离点
+        const nextDistance = Math.min(currentDistance + 1, totalDistance);
+        // 判断是否为最后一段且不足1公里
+        const isLessThanOneKm = nextDistance === totalDistance && (nextDistance - currentDistance) < 1;
+
+        // 计算该段用时
+        const segmentDistance = nextDistance - currentDistance;
+        const segmentTime = isLessThanOneKm ? currentPace * segmentDistance : currentPace;
+        const newCumulativeTime = cumulativeTime + segmentTime;
+
+        // 计算样式宽度
         const decreasePerKm = (initialPace - sprintPace) / (totalDistance - 1);
-        // 初始化每公里配速数组
-        let paceData = [];
-        // 当前公里配速
-        let currentPace = initialPace;
-        // 当前公里数
-        let currentDistance = 0;
-        // 初始化累计用时
-        let cumulativeTime = 0;
-        //设定样式初始宽度
-        let flexWidthVal = 0.6;//定义一个恒宽度初始值
-        let flexWidthVal_add = 0.5;// 定义一个递增的宽度初始值
-        let flexWidthVal_subtract = 0.9;// 定义一个递减的宽度初始值
-        // 定义宽度步长
-        let step = 0.4;
-        // 是否不足一公里
-        let isLessThanOneKm = false;
-        // 是否最快
-        let isFast = false;
+        const flexWidthVal = styleHelper.calculateFlexWidth(
+            decreasePerKm,
+            totalDistance,
+            currentDistance
+        );
 
-        while (currentDistance < totalDistance) {
-            // 下一个目标公里数
-            let nextDistance = currentDistance + 1;
-            // 当前段的配速 --- 这个变量有用 别乱改
-            const paceForThisSegment = currentPace;
+        // 计算近5公里用时
+        const nearFiveKmTime = this.calculateNearFiveKmTime(segmentTime, paceData, nextDistance);
 
-            // 如果达到或超过总距离，调整配速和距离
-            if (nextDistance >= totalDistance) {
-                currentPace = sprintPace;// 计算下一段的配速
-                nextDistance = totalDistance;
-                //更新累计用时 右侧为不足一公里用时
-                cumulativeTime += currentPace * (nextDistance - currentDistance);
-                if (nextDistance - currentDistance < 1) {
-                    isLessThanOneKm = true;
-                }
+        // 返回该段的完整数据
+        return {
+            km: nextDistance,
+            pace: currentPace,
+            currentKmTime: segmentTime,
+            isLessThanOneKm,
+            cumulativeTime: newCumulativeTime,
+            nearFiveKmTime,
+            flexWidthVal
+        };
+    },
 
-            } else {
-                cumulativeTime += currentPace;//更新累计用时
-                currentPace -= decreasePerKm;// 计算下一段的配速
-            }
+    /**
+     * 计算近5公里用时
+     * 累加当前段和前4段的用时（如果存在）
+     * @param {number} segmentTime 当前段用时（秒）
+     * @param {Array} paceData 已有的配速数据数组
+     * @param {number} nextDistance 下一个距离点（公里）
+     * @returns {number|null} 近5公里用时（秒），如果不足5公里返回null
+     */
+    calculateNearFiveKmTime(segmentTime, paceData, nextDistance) {
+        let nearFiveKmTime = segmentTime;
 
-            // 这里的逻辑应该是 不管它是正还是负都用剩余的宽度做加减计算
-            /**
-             * 此处应该优化方法，使宽度渲染得更加美丽
-             * 1. 如果速度是由慢变快，那么展示图形是 倒三角，则设置初始宽度为 最大，依次 递减 宽度
-             * 
-             * 2. 如果速度是由快变慢，那么展示图形是 正三角，则设置始始宽度为 最小，依次 递增 宽度
-             * 
-             * 3. 为保证渲染的图形更加有层次感，建议将 42 公里的数值，分为几个等级，例 0~10，10~20，20~30，30~42
-             * 
-             * 4. 还需要考虑到 用户给的速度 初始速度与冲刺速度相等的情况
-             * 
-             */
-            if (decreasePerKm > 0) {//用户给的速度是由慢变快
-                flexWidthVal_subtract -= step / Math.ceil(totalDistance);
-                flexWidthVal = flexWidthVal_subtract;
-            } else if (decreasePerKm < 0) {//用户给的速度是由快变慢
-                flexWidthVal_add += step / Math.ceil(totalDistance);
-                flexWidthVal = flexWidthVal_add;
-            } else {//用户给的速度是相等的
-                flexWidthVal = 0.6;
-            }
-            // 将当前段的配速和距离添加到数组中
-            paceData.push({
-                km: nextDistance,
-                pace: paceForThisSegment,
-                currentKmTime: isLessThanOneKm ?
-                    currentPace * (nextDistance - currentDistance) :
-                    paceForThisSegment,//当前段距离用时
-                isLessThanOneKm: isLessThanOneKm,
-                isLessThanOneKmText: "最后不足一公里用时",
-                isFast: isFast,
-                isFastText: "最快",
-                cumulativeTime: cumulativeTime,
-                cumulativeTimeText: "公里累计用时",
-                flexWidthVal: flexWidthVal
-            });
-
-
-            // 当最后一公里小于1时 找到最快配速并重新更新数据
-            if (nextDistance >= totalDistance) {
-                const minPaceIndex = paceData.reduce((minIndex, current, currentIndex, array) => {
-                    // 只有当 current.isLessThanOneKm 不为 true 时才进行比较
-                    if (!current.isLessThanOneKm && current.pace < array[minIndex].pace) {
-                        return currentIndex;
-                    }
-                    return minIndex;
-                }, 0);
-
-                // 确保找到的下标对应的元素满足 isLessThanOneKm != true
-                if (!paceData[minPaceIndex].isLessThanOneKm) {
-                    paceData[minPaceIndex].isFast = true;
+        if (paceData.length > 0) {
+            // 最多往前看4段
+            const lookBack = Math.min(4, paceData.length);
+            for (let i = paceData.length - lookBack; i < paceData.length; i++) {
+                if (paceData[i] && typeof paceData[i].currentKmTime === 'number') {
+                    nearFiveKmTime += paceData[i].currentKmTime;
                 }
             }
-
-            // 如果当前距离大于5公里，计算最近五公里的用时
-            if (nextDistance > 5) {
-                const nearFiveKmPaces = paceData.slice(-5).map(p => p.pace);
-                const nearFiveKmTime = nearFiveKmPaces.reduce((acc, pace) => acc + pace, 0);
-                paceData[paceData.length - 1].nearFiveKmTime = nearFiveKmTime;
-                paceData[paceData.length - 1].nearFiveKmTimeText = "近5公里用时";
-            }
-
-            // 更新当前距离
-            currentDistance = nextDistance;
         }
+
+        // 只有达到5公里才返回计算结果
+        return nextDistance >= 5 ? nearFiveKmTime : null;
+    },
+
+    /**
+     * 标记最快配速
+     * 遍历所有配速数据，找出并标记最快的一段
+     * @param {Array} paceData 配速数据数组
+     * @returns {Array} 处理后的配速数据数组
+     */
+    markFastestPace(paceData) {
+        // 找出最快配速的索引（不包括不足1公里的段）
+        const minPaceIndex = paceData.reduce((minIndex, current, currentIndex, array) => {
+            if (!current.isLessThanOneKm && current.pace < array[minIndex].pace) {
+                return currentIndex;
+            }
+            return minIndex;
+        }, 0);
+
+        // 标记最快配速段
+        if (!paceData[minPaceIndex].isLessThanOneKm) {
+            paceData[minPaceIndex].isFast = true;
+        }
+
         return paceData;
     },
 
     /**
-     * 为头部距离赋值
-     * @param {*} distance 
+     * 根据初始配速、冲刺配速、公里数，生成对应的配速数组
+     * 主要的配速计算逻辑
+     * @param {number} initialPace 初始配速（秒）
+     * @param {number} sprintPace 冲刺配速（秒）
+     * @param {number} totalDistance 总距离（公里）
+     * @returns {Array} 配速数据数组
+     */
+    calculatePace(initialPace, sprintPace, totalDistance) {
+        // 验证输入
+        if (totalDistance <= 0) {
+            return [];
+        }
+
+        const paceData = [];
+        let currentPace = initialPace;
+        let currentDistance = 0;
+        let cumulativeTime = 0;
+
+        // 逐段计算配速数据
+        while (currentDistance < totalDistance) {
+            // 计算当前段的配速数据
+            const segmentData = this.calculateSegmentPaceData(
+                currentDistance,
+                totalDistance,
+                currentPace,
+                cumulativeTime,
+                paceData,
+                initialPace,
+                sprintPace
+            );
+
+            // 保存数据并更新累计时间
+            paceData.push(segmentData);
+            cumulativeTime = segmentData.cumulativeTime;
+
+            // 更新配速和距离
+            if (segmentData.km < totalDistance) {
+                currentPace -= (initialPace - sprintPace) / (totalDistance - 1);
+            } else {
+                currentPace = sprintPace;
+            }
+            currentDistance = segmentData.km;
+        }
+
+        // 标记最快配速并返回结果
+        return this.markFastestPace(paceData);
+    },
+
+    /**
+     * 计算平均配速
+     * @param {Array} paceData 配速数据数组
+     * @returns {string} 格式化后的平均配速
+     */
+    calculateAveragePace(paceData) {
+        const totalPace = paceData.reduce((sum, current) => sum + current.pace, 0);
+        return Math.round(totalPace / paceData.length).toString();
+    },
+
+    /**
+     * 根据距离判断是全马还是半马
+     * @param {number} distance 距离（公里）
+     * @returns {string|boolean} 距离类型描述或false
      */
     determineDistanceType(distance) {
         if (distance === 21.0975) return '半马';
@@ -225,61 +333,9 @@ Page({
     },
 
     /**
-     * 这是一个计算平均配速的方法
-     * @param {*} paceData 
+     * 分享到朋友圈的配置
      */
-    calculateAveragePace(paceData) {
-        const totalSeconds = paceData.reduce((acc, { pace }) => acc + pace, 0);
-        const averageSeconds = Math.round(totalSeconds / paceData.length);//四舍五入
-        return common.formatTime(averageSeconds);
-    },
-
-    /**
-     * 生命周期函数--监听页面初次渲染完成
-     */
-    onReady() {
-
-    },
-
-    /**
-     * 生命周期函数--监听页面显示
-     */
-    onShow() {
-
-    },
-
-    /**
-     * 生命周期函数--监听页面隐藏
-     */
-    onHide() {
-
-    },
-
-    /**
-     * 生命周期函数--监听页面卸载
-     */
-    onUnload() {
-
-    },
-
-    /**
-     * 页面相关事件处理函数--监听用户下拉动作
-     */
-    onPullDownRefresh() {
-
-    },
-
-    /**
-     * 页面上拉触底事件的处理函数
-     */
-    onReachBottom() {
-
-    },
-    // 分享到好友 用户点击右上角分享
-    onShareAppMessage() {
-    },
-    // 分享到朋友圈
     onShareTimeline() {
-    },
-
-})
+        return share.getShareTimeline();
+    }
+});

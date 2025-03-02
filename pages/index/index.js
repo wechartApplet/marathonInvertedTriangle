@@ -9,6 +9,7 @@ const distancePicker = require('../../utils/distancePicker.js');
 const common = require('../../utils/common.js');
 // 导入分享的函数
 const share = require('../../utils/share.js');
+const { DEFAULT_VALUES } = require('../../utils/constants.js');
 
 Page({
     data: {
@@ -34,20 +35,38 @@ Page({
                 type: 'distance'
             }
         ],
-        submitButtonLabel: '提交'
+        submitButtonLabel: '提交',
+        isSubmitDisabled: false
     },
     onLoad: function () {
-        // 分享到好友和朋友圈
-        // wx.showShareMenu({
-        //     withShareTicket: true,
-        //     menus: ['shareAppMessage', 'shareTimeline']
-        // });
-        // 加载时将生成的时间值和距离值进行对应的赋值
+        console.log('index onLoad');
+        // 开启分享功能
+        wx.showShareMenu({
+            withShareTicket: true,
+            menus: ['shareAppMessage', 'shareTimeline']
+        });
+
+        this.initializePickerData();
+    },
+    onShow: function() {
+        console.log('index onShow');
+    },
+    onHide: function() {
+        console.log('index onHide');
+    },
+    onUnload: function() {
+        console.log('index onUnload');
+    },
+    /**
+     * 初始化选择器数据
+     */
+    initializePickerData: function () {
         const timeOptions = timePicker.generateTimeList();
         const distanceOptions = distancePicker.generateDistanceOptions();
+
         const pickerItems = this.data.pickerItems.map(item => {
             if (item.type === 'initial' || item.type === 'sprint') {
-                return { ...item, options: timeOptions };//迭代item元素并将timeOptions里的元素值命名为options重新赋值给item
+                return { ...item, options: timeOptions };
             } else if (item.type === 'distance') {
                 return { ...item, options: distanceOptions };
             }
@@ -63,12 +82,13 @@ Page({
         this.setDefaultIndices();
     },
 
-    // 设置默认的初始配速、冲刺配速和运动距离的索引值
+    /**
+     * 设置默认的选择器索引
+     */
     setDefaultIndices: function () {
-        // 获取默认值在数组中的索引位置
-        const initialIndex = common.getIndex('06:30', this.data.timeOptions);
-        const sprintIndex = common.getIndex('04:30', this.data.timeOptions);
-        const distanceIndex = common.getIndex(21.0975, this.data.distanceOptions);
+        const initialIndex = common.getIndex(DEFAULT_VALUES.INITIAL_PACE, this.data.timeOptions);
+        const sprintIndex = common.getIndex(DEFAULT_VALUES.SPRINT_PACE, this.data.timeOptions);
+        const distanceIndex = common.getIndex(DEFAULT_VALUES.HALF_MARATHON, this.data.distanceOptions);
 
         const pickerItems = this.data.pickerItems.map(item => {
             if (item.type === 'initial') {
@@ -84,7 +104,9 @@ Page({
         this.setData({ pickerItems });
     },
 
-    // 当用户选择及时更新页面
+    /**
+     * 处理选择器值变化
+     */
     bindPickerChange: function (e) {
         const { type, value } = e.detail;
         const pickerItems = this.data.pickerItems.map(item => {
@@ -95,10 +117,26 @@ Page({
         });
 
         this.setData({ pickerItems });
+        this.validateInputs();
     },
 
-    // 点击提交跳转生成对应的页面
+    /**
+     * 验证输入值
+     * @returns {boolean} 是否验证通过
+     */
+    validateInputs: function () {
+        this.setData({ isSubmitDisabled: false });
+        return true;
+    },
+
+    /**
+     * 计算配速并跳转
+     */
     calculatePace: function () {
+        if (!this.validateInputs()) {
+            return;
+        }
+
         const pickerItems = this.data.pickerItems;
         const initialTimeIndex = pickerItems.find(item => item.type === 'initial').selectedIndex;
         const sprintTimeIndex = pickerItems.find(item => item.type === 'sprint').selectedIndex;
@@ -118,21 +156,34 @@ Page({
             sprintTime: sprintTime,
             distance: distance
         };
-
-        // 6. 将数组序列化
-        let paceDataString = encodeURIComponent(JSON.stringify(paceDataObj));
-
-        // 7. 使用redirectTo替代navigateTo，避免页面栈累积
-        wx.redirectTo({
-            url: '/pages/paceChart/paceChart?paceData=' + paceDataString
-        });
+        // 6. 跳转页面
+        try {
+            const paceDataString = encodeURIComponent(JSON.stringify(paceDataObj));
+            wx.navigateTo({
+                url: '/pages/paceChart/paceChart?paceData=' + paceDataString,
+                fail: (error) => {
+                    console.error('页面跳转失败:', error);
+                    wx.showToast({
+                        title: '页面跳转失败，请重试',
+                        icon: 'none',
+                        duration: 2000
+                    });
+                }
+            });
+        } catch (error) {
+            console.error('数据处理失败:', error);
+            wx.showToast({
+                title: '数据处理失败，请重试',
+                icon: 'none',
+                duration: 2000
+            });
+        }
     },
-    // 分享到好友
-    onShareAppMessage() {
-        // return share.getShareAppMessage();
-    },
-    // 分享到朋友圈
+
+    /**
+     * 分享到朋友圈
+     */
     onShareTimeline() {
-        // return share.getShareTimeline();
+        return share.getShareTimeline();
     }
 });
